@@ -6,7 +6,7 @@ import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
-  const [imagePreview, setImagePreview] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const { selectedUser, sendMessage } = useChatStore();
   const { authUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -22,9 +22,19 @@ const MessageInput = () => {
       return;
     }
 
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size should be less than 5MB");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
-      setImagePreview(file);
+      const base64String = reader.result as string;
+      setImagePreview(base64String);
+    };
+    reader.onerror = () => {
+      toast.error("Error reading image file");
     };
     reader.readAsDataURL(file);
   };
@@ -41,11 +51,12 @@ const MessageInput = () => {
     if (!text.trim() && !imagePreview) return;
 
     try {
+      // Send the complete data URL to Cloudinary
       await sendMessage({
         text: text.trim(),
-        image: imagePreview,
-        senderId: "",
-        receiverId: "",
+        image: imagePreview, // Send the full data URL including the prefix
+        senderId: authUser._id,
+        receiverId: selectedUser._id,
       });
 
       // Clear form
@@ -54,6 +65,7 @@ const MessageInput = () => {
       if (fileInputRef.current) fileInputRef.current.value = "";
     } catch (error) {
       console.error("Failed to send message:", error);
+      toast.error("Failed to send message");
     }
   };
 
@@ -63,7 +75,7 @@ const MessageInput = () => {
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
             <img
-              src={URL.createObjectURL(imagePreview)}
+              src={imagePreview}
               alt="Preview"
               className="w-20 h-20 object-cover rounded-lg border border-zinc-700"
             />

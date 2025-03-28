@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
-import { useAuthStore } from "./useAuthStore";
+// import { useAuthStore } from "./useAuthStore";
 // import { Socket } from "socket.io-client";
 
 interface User {
@@ -24,7 +24,7 @@ interface Message {
 
 interface MessageData {
   text: string;
-  image: File | null;
+  image: string | null;
   senderId: string;
   receiverId: string;
 }
