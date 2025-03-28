@@ -106,8 +106,9 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {
-      console.log("error in update profile:", error);
-      toast.error("Failed to update profile");
+      if (error instanceof AxiosError && error.response) {
+        toast.error(error.response.data.message);
+      }
     } finally {
       set({ isUpdatingProfile: false });
     }
