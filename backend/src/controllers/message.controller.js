@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import { io, getReceiverSocketId } from "../lib/socket.js";
 
 export const getUsersForSideBar = async (req, res) => {
   try {
@@ -61,7 +62,10 @@ export const sendMessage = async (req, res) => {
 
     await message.save();
 
-    //TODO: realtime functionality goes here
+    const receiverSocketId = getReceiverSocketId(userToChatId);
+    if (receiverSocketId) {
+      io.to(receiverSocketId).emit("newMessage", message);
+    }
 
     res.status(200).json(message);
   } catch (error) {

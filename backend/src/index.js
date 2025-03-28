@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 
 import { connectDB } from "./lib/db.js";
-
+import { app, server } from "./lib/socket.js";
 import authRoutes from "./routes/auth.routes.js";
 import messageRoutes from "./routes/message.route.js";
 
@@ -15,9 +15,9 @@ const PORT = process.env.PORT;
 app.use(express.json({ limit: "50mb" })); // Increase the limit to 50MB
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
-server.use(
+app.use(
   cors({
-    origin: "http://localhost:5173" || "http://localhost:5174",
+    origin: "http://localhost:5175",
     credentials: true,
   })
 );
@@ -25,7 +25,7 @@ server.use(
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
-app.listen(PORT || 5000, () => {
+server.listen(PORT, () => {
   console.log("server is running on PORT:" + PORT);
   connectDB();
 });

@@ -5,7 +5,7 @@ import ChatContainer from "../components/ChatContainer";
 import NoChatSelected from "../components/NoChatSelected";
 
 const HomePage: React.FC = () => {
-  const { users, isUsersLoading, getUsers, selectedUser } = useChatStore();
+  const { getUsers, selectedUser } = useChatStore();
 
   useEffect(() => {
     getUsers();

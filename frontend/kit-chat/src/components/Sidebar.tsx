@@ -16,7 +16,7 @@ const Sidebar: React.FC = () => {
   const { users, isUsersLoading, getUsers, selectedUser, setSelectedUser } =
     useChatStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState<boolean>(false);
-  //   const { onlineUsers } = useAuthStore();
+  const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
     getUsers();
@@ -25,8 +25,9 @@ const Sidebar: React.FC = () => {
   if (isUsersLoading) return <SideBarSkeleton />;
 
   // Filter users based on online status
-  const onlineUsers = users.filter((user) => user.status === "online");
-  const filteredUsers = showOnlineOnly ? onlineUsers : users;
+  const filteredUsers = showOnlineOnly
+    ? users.filter((user) => onlineUsers.includes(user._id))
+    : users;
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -73,7 +74,7 @@ const Sidebar: React.FC = () => {
                 alt={user.fullName}
                 className="size-12 object-cover rounded-full"
               />
-              {user.status === "online" && (
+              {onlineUsers.includes(user._id) && (
                 <span
                   className="absolute bottom-0 right-0 size-3 bg-green-500 
                   rounded-full ring-2 ring-zinc-900"
@@ -85,7 +86,7 @@ const Sidebar: React.FC = () => {
             <div className="hidden lg:block text-left min-w-0">
               <div className="font-medium truncate">{user.fullName}</div>
               <div className="text-sm text-zinc-400">
-                {user.status === "online" ? "Online" : "Offline"}
+                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
               </div>
             </div>
           </button>

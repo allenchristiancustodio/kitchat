@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
-// import { useAuthStore } from "./useAuthStore";
-// import { Socket } from "socket.io-client";
+import { useAuthStore } from "./useAuthStore";
+import { Socket } from "socket.io-client";
 
 interface User {
   _id: string;
@@ -41,15 +41,14 @@ interface ChatState {
   getUsers: () => Promise<void>;
   getMessages: (userId: string) => Promise<void>;
   sendMessage: (messageData: MessageData) => Promise<void>;
-  //   subscribeToMessages: () => void;
-  //   unsubscribeFromMessages: () => void;
+  subscribeToMessages: () => void;
+  unsubscribeFromMessages: () => void;
   setSelectedUser: (user: User | null) => void;
 }
 
-// Extend the AuthState to include socket
-// interface AuthStateWithSocket {
-//   socket: Socket;
-// }
+interface AuthStateWithSocket {
+  socket: Socket;
+}
 
 export const useChatStore = create<ChatState>((set, get) => ({
   // Initial state
@@ -94,19 +93,19 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  sendMessage: async (messageData: MessageData) => {
-    const { selectedUser, messages } = get();
-    if (!selectedUser) {
+  sendMessage: async (messageData) => {
+    const state = get();
+    if (!state.selectedUser) {
       toast.error("No user selected");
       return;
     }
 
     try {
       const res = await axiosInstance.post<Message>(
-        `/messages/send/${selectedUser._id}`,
+        `/messages/send/${state.selectedUser._id}`,
         messageData
       );
-      set({ messages: [...messages, res.data] });
+      set({ messages: [...state.messages, res.data] });
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as { response: { data: { message: string } } };
@@ -117,29 +116,30 @@ export const useChatStore = create<ChatState>((set, get) => ({
     }
   },
 
-  //   subscribeToMessages: () => {
-  //     const state = get();
-  //     if (!state.selectedUser) return;
+  subscribeToMessages: () => {
+    const state = get();
+    if (!state.selectedUser) return;
 
-  //     const authState = useAuthStore.getState() as unknown as AuthStateWithSocket;
-  //     const socket = authState.socket;
+    const authState = useAuthStore.getState() as unknown as AuthStateWithSocket;
+    const socket = authState.socket;
 
-  //     socket.on("newMessage", (newMessage: Message) => {
-  //       const isMessageSentFromSelectedUser =
-  //         newMessage.senderId === state.selectedUser?._id;
-  //       if (!isMessageSentFromSelectedUser) return;
+    socket.on("newMessage", (newMessage: Message) => {
+      const isMessageFromSelectedChat =
+        newMessage.senderId === state.selectedUser?._id ||
+        newMessage.receiverId === state.selectedUser?._id;
 
-  //       set({
-  //         messages: [...state.messages, newMessage],
-  //       });
-  //     });
-  //   },
+      if (!isMessageFromSelectedChat) return;
 
-  //   unsubscribeFromMessages: () => {
-  //     const authState = useAuthStore.getState() as unknown as AuthStateWithSocket;
-  //     const socket = authState.socket;
-  //     socket.off("newMessage");
-  //   },
+      set((state) => ({
+        messages: [...state.messages, newMessage],
+      }));
+    });
+  },
+
+  unsubscribeFromMessages: () => {
+    const socket = useAuthStore.getState().socket;
+    socket?.off("newMessage");
+  },
 
   setSelectedUser: (selectedUser: User | null) => set({ selectedUser }),
 }));
