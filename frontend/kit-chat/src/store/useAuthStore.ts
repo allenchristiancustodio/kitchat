@@ -11,6 +11,7 @@ interface AuthState {
   isLoggingIn: boolean;
   isUpdatingProfile: boolean;
   isCheckingAuth: boolean;
+  onlineUsers: AuthUser[];
 
   // Define actions to update the state
   setAuthUser: (user: AuthUser | null) => void;
@@ -35,6 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  onlineUsers: [],
 
   // Actions to update state
   setAuthUser: (user) => set({ authUser: user }),
@@ -100,7 +102,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   updateProfile: async (data) => {
     set({ isUpdatingProfile: true });
     try {
-      const res = await axiosInstance.post("/auth/update-profile", data);
+      const res = await axiosInstance.put("/auth/update-profile", data);
       set({ authUser: res.data });
       toast.success("Profile updated successfully");
     } catch (error) {

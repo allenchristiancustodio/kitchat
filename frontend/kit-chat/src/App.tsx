@@ -11,10 +11,11 @@ import ProfilePage from "./pages/ProfilePage";
 
 import { useAuthStore } from "./store/useAuthStore";
 import { Toaster } from "react-hot-toast";
+import { useThemeStore } from "./store/useThemeStore";
 
 const App: React.FC = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
-
+  const { theme } = useThemeStore();
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -26,7 +27,7 @@ const App: React.FC = () => {
     );
 
   return (
-    <div>
+    <div data-theme={theme}>
       <Navbar />
       <Routes>
         <Route
@@ -43,7 +44,7 @@ const App: React.FC = () => {
         />
         <Route
           path="/settings"
-          element={!authUser ? <SettingsPage /> : <Navigate to="/" />}
+          element={authUser ? <SettingsPage /> : <Navigate to="/" />}
         />
         <Route
           path="/profile"

@@ -18,13 +18,13 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "http://localhost:5174",
+    origin: "http://localhost:5175",
     credentials: true,
   })
 );
 
 app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT || 5000, () => {
   console.log("server is running on PORT:" + PORT);
