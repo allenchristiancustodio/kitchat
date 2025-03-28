@@ -50,7 +50,7 @@ export const sendMessage = async (req, res) => {
       senderId,
       receiverId: userToChatId,
       text,
-      imageUrl,
+      image: imageUrl,
     });
 
     await message.save();

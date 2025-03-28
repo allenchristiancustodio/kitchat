@@ -14,7 +14,8 @@ interface User {
 
 interface Message {
   _id: string;
-  content: string;
+  text: string;
+  image: string | null;
   senderId: string;
   receiverId: string;
   createdAt: string;
@@ -22,7 +23,8 @@ interface Message {
 }
 
 interface MessageData {
-  content: string;
+  text: string;
+  image: File | null;
   senderId: string;
   receiverId: string;
 }
@@ -93,18 +95,18 @@ export const useChatStore = create<ChatState>((set, get) => ({
   },
 
   sendMessage: async (messageData: MessageData) => {
-    const state = get();
-    if (!state.selectedUser) {
+    const { selectedUser, messages } = get();
+    if (!selectedUser) {
       toast.error("No user selected");
       return;
     }
 
     try {
       const res = await axiosInstance.post<Message>(
-        `/messages/send/${state.selectedUser._id}`,
+        `/messages/send/${selectedUser._id}`,
         messageData
       );
-      set({ messages: [...state.messages, res.data] });
+      set({ messages: [...messages, res.data] });
     } catch (error: unknown) {
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as { response: { data: { message: string } } };
