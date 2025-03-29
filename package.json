@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "npm install --prefix frontend/kit-chat && npm run build --prefix frontend/kit-chat && npm install --prefix backend",
-    "start": "npm run start --prefix backend"
+    "build": "cd frontend/kit-chat && npm install && npm run build && cd ../../backend && npm install",
+    "start": "cd backend && node index.js"
   },
   "repository": {
     "type": "git",
