@@ -6,7 +6,9 @@ import { AxiosError } from "axios";
 import { io, Socket } from "socket.io-client";
 
 // Define the types for the state and actions
-const BASE_URL = "http://localhost:5002";
+const BASE_URL =
+  import.meta.env.MODE === "development" ? "http://localhost:5002" : "/";
+
 interface AuthState {
   authUser: AuthUser | null;
   isSigningUp: boolean;
@@ -57,6 +59,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const res = await axiosInstance.get("/auth/check"); // Make the async API call
       set({ authUser: res.data }); // Update authUser and reset loading state
       get().connectSocket();
+      console.log(get().onlineUsers);
     } catch (error) {
       set({ authUser: null }); // Set loading state to false on error
     } finally {
