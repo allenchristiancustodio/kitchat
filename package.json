@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
     "build": "cd frontend/kit-chat && npm install && npm run build && cd ../../backend && npm install",
-    "start": "cd backend && node index.js"
+    "start": "npm run start --prefix backend"
   },
   "repository": {
     "type": "git",
