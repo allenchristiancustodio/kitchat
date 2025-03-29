@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "install-all": "npm install && npm install --prefix frontend/kit-chat && npm install --prefix backend",
-    "build": "npm run install-all && npm run build --prefix frontend/kit-chat && npm run build --prefix backend",
+    "build": "npm install --prefix frontend/kit-chat && npm run build --prefix frontend/kit-chat && npm install --prefix backend",
     "start": "npm run start --prefix backend"
   },
   "repository": {
@@ -12,7 +11,7 @@
     "url": "git+https://github.com/allenchristiancustodio/kitchat.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Allen Christian Custodio",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/allenchristiancustodio/kitchat/issues"
